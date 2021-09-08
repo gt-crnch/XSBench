@@ -56,6 +56,13 @@ ifneq (,$(findstring clang,$(CC)))
   LDFLAGS += -lOpenCL
 endif
 
+# DPC++ Compiler
+ifneq (,$(findstring dpcpp,$(CC)))
+  CC = dpcpp
+  CFLAGS += -fsycl
+  LDFLAGS += -lOpenCL
+endif
+
 # Debug Flags
 ifeq ($(DEBUG),yes)
   CFLAGS += -g
