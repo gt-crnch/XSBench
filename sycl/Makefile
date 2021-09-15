@@ -59,8 +59,16 @@ endif
 # DPC++ Compiler
 ifneq (,$(findstring dpcpp,$(CC)))
   CC = dpcpp
-  CFLAGS += -fsycl
+  CFLAGS += -fsycl -g -fno-sycl-early-optimizations
   LDFLAGS += -lOpenCL
+  # CFLAGS += -fsycl-link
+  CFLAGS += -fsycl-unnamed-lambda
+  CFLAGS += -Xshardware
+  CFLAGS += -fintelfpga
+  # CFLAGS += -Xsprofile
+  CFLAGS += -Xsboard=intel_s10sx_pac:pac_s10
+  # CFLAGS += -fsycl-targets=spir64_fpga-unknown-unknown-sycldevice
+  CFLAGS += -Xsdont-error-if-large-area-est
 endif
 
 # Debug Flags

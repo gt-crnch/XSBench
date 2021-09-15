@@ -48,7 +48,24 @@ unsigned long long run_event_based_simulation(Inputs in, SimulationData SD, int 
 	{
 		// create a queue using the default device for the platform (cpu, gpu)
 
-		queue sycl_q{default_selector()};
+		queue sycl_q;
+		char * devchar = std::getenv("XS_DEVICE");
+		std::string devname = (devchar == NULL) ? "None" : devchar;
+		if (devname == "CPU") {
+			sycl_q = cpu_selector();
+		} else if (devname == "GPU") {
+			sycl_q = gpu_selector();
+		} else if (devname == "HOST") {
+       			sycl_q = host_selector{};
+   		} else if (devname == "FPGA_EMU") {
+		       sycl_q = INTEL::fpga_emulator_selector{};
+   		} else if (devname == "FPGA") {
+       			sycl_q = INTEL::fpga_selector{};
+   		} else {
+       			std::cout << "XS_DEVICE must be CPU, GPU, FPGA_EMU, FPGA or HOST" << std::endl;
+       			std::abort();
+   		}
+		// {default_selector()};
 		//queue sycl_q{gpu_selector()};
 		//queue sycl_q{cpu_selector()};
 		if(mype == 0 ) printf("Running on: %s\n", sycl_q.get_device().get_info<cl::sycl::info::device::name>().c_str());

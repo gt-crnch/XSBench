@@ -11,7 +11,7 @@
 #include<stdint.h>
 #include <chrono> 
 #include <CL/sycl.hpp>
-
+#include <CL/sycl/INTEL/fpga_extensions.hpp>
 // Papi Header
 #ifdef PAPI
 #include "papi.h"
