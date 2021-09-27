@@ -71,20 +71,20 @@ endif
 ifneq (,$(findstring dpcpp,$(CC)))
   CC = dpcpp
   CFLAGS += -fsycl-unnamed-lambda
-ifneq (,$(filter $(DPCPP_MODE),fpga_emu,fpga_report fpga_hw))
+ifneq (,$(filter $(DPCPP_MODE),fpga_emu fpga_report fpga_hw))
   CFLAGS += -fintelfpga
 endif
 # Emulation only flags
 ifneq (,$(findstring fpga_emu,$(DPCPP_MODE)))
   program = XSBench.fpga_emu
 endif
+# Report only flags
+ifneq (,$(findstring fpga_report,$(DPCPP_MODE)))
+  CFLAGS += -fsycl-link -fsycl -fsycl-unnamed-lambda -g  -fno-sycl-early-optimizations
+endif
 #Report and HW shared flags
 ifneq (,$(filter $(DPCPP_MODE),fpga_report fpga_hw))
   CFLAGS += -Xshardware -Xsboard=intel_s10sx_pac:pac_s10
-endif
-# Report only flags
-ifneq (,$(findstring fpga_report,$(DPCPP_MODE)))
-  CFLAGS += -fsycl-link
 endif
 # HW only flags
 ifneq (,$(findstring fpga_hw,$(DPCPP_MODE)))
@@ -129,7 +129,7 @@ $(program): $(obj) XSbench_header.h Makefile
 	$(CC) $(CFLAGS) $(obj) -o $@ $(LDFLAGS)
 
 report: $(obj) XSbench_header.h Makefile
-	$(CC) $(CFLAGS) $(obj)
+	$(CC) $(CFLAGS) -o $@ $(obj) $(LDFLAGS)
 
 %.o: %.cpp XSbench_header.h Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
