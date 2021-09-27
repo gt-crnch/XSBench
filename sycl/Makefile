@@ -57,19 +57,42 @@ ifneq (,$(findstring clang,$(CC)))
 endif
 
 # DPC++ Compiler
+
+# FPGA_EMULATOR
+# dpcpp -fintelfpga -DFPGA_EMULATOR <target>.cpp
+
+# Report 
+#dpcpp -fintelfpga -Xshardware -Xsboard=<FPGA_BOARD> -fsycl-link=early <target>.cpp
+
+#Hardware
+#dpcpp -fintelfpga -Xshardware -Xsboard=<FPGA_BOARD> <target>.cpp
+
+
 ifneq (,$(findstring dpcpp,$(CC)))
   CC = dpcpp
-  CFLAGS += -fsycl -g -fno-sycl-early-optimizations
-  LDFLAGS += -lOpenCL
-  # CFLAGS += -fsycl-link
   CFLAGS += -fsycl-unnamed-lambda
-  CFLAGS += -Xshardware
+ifneq (,$(findstring fpga_emu,$(DPCPP_MODE)))
   CFLAGS += -fintelfpga
-  # CFLAGS += -Xsprofile
-  CFLAGS += -Xsboard=intel_s10sx_pac:pac_s10
-  # CFLAGS += -fsycl-targets=spir64_fpga-unknown-unknown-sycldevice
-  CFLAGS += -Xsdont-error-if-large-area-est
+  program = XSBench.fpga_emu
+  #Report only - comment out for HW build
 endif
+ifneq (,$(findstring fpga_report,$(DPCPP_MODE)))
+  CFLAGS += -fintelfpga -fsycl-link=early
+  program = XSBench_fpga_report.a
+endif
+  #Report and HW
+ifneq (,$(filter $(DPCPP_MODE),fpga_report fpga_hw))
+  CFLAGS += -fintelfpga -Xshardware
+  CFLAGS += -Xsboard=intel_s10sx_pac:pac_s10
+  CFLAGS += -Xsdont-error-if-large-area-est
+  program = XSBench.fpga
+endif
+endif
+
+# Unused flags
+# CFLAGS += -fsycl-targets=spir64_fpga-unknown-unknown-sycldevice
+# CFLAGS += -fsycl -fno-sycl-early-optimizations
+# LDFLAGS += -lOpenCL
 
 # Debug Flags
 ifeq ($(DEBUG),yes)
@@ -105,7 +128,7 @@ $(program): $(obj) XSbench_header.h Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(program) $(obj)
+	rm -rf $(program) $(program).* $(obj)
 
 edit:
 	vim -p $(source) XSbench_header.h
