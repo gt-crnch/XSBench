@@ -71,20 +71,24 @@ endif
 ifneq (,$(findstring dpcpp,$(CC)))
   CC = dpcpp
   CFLAGS += -fsycl-unnamed-lambda
-ifneq (,$(findstring fpga_emu,$(DPCPP_MODE)))
+ifneq (,$(filter $(DPCPP_MODE),fpga_emu,fpga_report fpga_hw))
   CFLAGS += -fintelfpga
+endif
+# Emulation only flags
+ifneq (,$(findstring fpga_emu,$(DPCPP_MODE)))
   program = XSBench.fpga_emu
-  #Report only - comment out for HW build
 endif
-ifneq (,$(findstring fpga_report,$(DPCPP_MODE)))
-  CFLAGS += -fintelfpga -fsycl-link=early
-  program = XSBench_fpga_report.a
-endif
-  #Report and HW
+#Report and HW shared flags
 ifneq (,$(filter $(DPCPP_MODE),fpga_report fpga_hw))
-  CFLAGS += -fintelfpga -Xshardware
-  CFLAGS += -Xsboard=intel_s10sx_pac:pac_s10
-  CFLAGS += -Xsdont-error-if-large-area-est
+  CFLAGS += -Xshardware -Xsboard=intel_s10sx_pac:pac_s10
+endif
+# Report only flags
+ifneq (,$(findstring fpga_report,$(DPCPP_MODE)))
+  CFLAGS += -fsycl-link
+endif
+# HW only flags
+ifneq (,$(findstring fpga_hw,$(DPCPP_MODE)))
+  CFLAGS += -fintelfpga -Xsdont-error-if-large-area-est
   program = XSBench.fpga
 endif
 endif
@@ -123,6 +127,9 @@ endif
 
 $(program): $(obj) XSbench_header.h Makefile
 	$(CC) $(CFLAGS) $(obj) -o $@ $(LDFLAGS)
+
+report: $(obj) XSbench_header.h Makefile
+	$(CC) $(CFLAGS) $(obj)
 
 %.o: %.cpp XSbench_header.h Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
