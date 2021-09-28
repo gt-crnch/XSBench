@@ -1,0 +1,56 @@
+XS_DEVICE=FPGA ./XSBench.fpga -m event
+================================================================================
+                   __   __ ___________                 _
+                   \ \ / //  ___| ___ \               | |
+                    \ V / \ `--.| |_/ / ___ _ __   ___| |__
+                    /   \  `--. \ ___ \/ _ \ '_ \ / __| '_ \
+                   / /^\ \/\__/ / |_/ /  __/ | | | (__| | | |
+                   \/   \/\____/\____/ \___|_| |_|\___|_| |_|
+
+================================================================================
+                    Developed at Argonne National Laboratory
+                                   Version: 19
+================================================================================
+                                  INPUT SUMMARY
+================================================================================
+Programming Model:            SYCL
+Simulation Method:            Event Based
+Grid Type:                    Unionized Grid
+Materials:                    12
+H-M Benchmark Size:           large
+Total Nuclides:               355
+Gridpoints (per Nuclide):     11,303
+Unionized Energy Gridpoints:  4,012,565
+Total XS Lookups:             17,000,000
+Est. Memory Usage (MB):       5,649
+Binary File Mode:             Off
+================================================================================
+                         INITIALIZATION - DO NOT PROFILE
+================================================================================
+Intializing nuclide grids...
+Intializing unionized grid...
+Intializing material data...
+Intialization complete. Allocated 5648 MB of data.
+
+================================================================================
+                                   SIMULATION
+================================================================================
+Allocating an additional 64.8 MB of memory for verification arrays...
+Running on: pac_s10 : Intel PAC Platform (pac_eb00000)
+Initializing device buffers and JIT compiling kernel...
+Kernel initialization, compilation, and launch took 4.22 seconds.
+Beginning event based simulation...
+
+Simulation complete.
+================================================================================
+                                     RESULTS
+================================================================================
+Total Time Statistics (SYCL+OpenCL Init / JIT Compilation + Simulation Kernel)
+Runtime:               979.199 seconds
+Lookups:               17,000,000
+Lookups/s:             17,361
+Simulation Kernel Only Statistics
+Runtime:               979.199 seconds
+Lookups/s:             17,361
+Verification checksum: 952131 (Valid)
+================================================================================
