@@ -67,12 +67,18 @@ endif
 #Hardware
 #dpcpp -fintelfpga -Xshardware -Xsboard=<FPGA_BOARD> <target>.cpp
 
+#Profile on the Hardware
+#dpcpp -fintelfpga -Xshardware -Xsboard=<FPGA_BOARD> -Xsprofile <target>.cpp
 
 ifneq (,$(findstring dpcpp,$(CC)))
   CC = dpcpp
   CFLAGS += -fsycl-unnamed-lambda
-ifneq (,$(filter $(DPCPP_MODE),fpga_emu fpga_report fpga_hw))
+ifneq (,$(filter $(DPCPP_MODE),fpga_emu fpga_report fpga_hw fpga_profile))
   CFLAGS += -fintelfpga
+endif
+# CPU flags
+ifneq (,$(findstring cpu,$(DPCPP_MODE)))
+  program = XSBench.cpu
 endif
 # Emulation only flags
 ifneq (,$(findstring fpga_emu,$(DPCPP_MODE)))
@@ -81,15 +87,21 @@ endif
 # Report only flags
 ifneq (,$(findstring fpga_report,$(DPCPP_MODE)))
   CFLAGS += -fsycl-link -fsycl -fsycl-unnamed-lambda -g  -fno-sycl-early-optimizations
+  program = XSBench.fpga_report
 endif
 #Report and HW shared flags
-ifneq (,$(filter $(DPCPP_MODE),fpga_report fpga_hw))
+ifneq (,$(filter $(DPCPP_MODE),fpga_report fpga_hw fpga_profile))
   CFLAGS += -Xshardware -Xsboard=intel_s10sx_pac:pac_s10
 endif
 # HW only flags
 ifneq (,$(findstring fpga_hw,$(DPCPP_MODE)))
-  CFLAGS += -fintelfpga -Xsdont-error-if-large-area-est
+  CFLAGS += -Xsdont-error-if-large-area-est
   program = XSBench.fpga
+endif
+# HW profile only flags
+ifneq (,$(findstring fpga_profile,$(DPCPP_MODE)))
+  CFLAGS += -Xsprofile
+  program = XSBench.fpga.profile
 endif
 endif
 
