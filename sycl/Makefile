@@ -76,8 +76,8 @@ endif
 ifneq (,$(findstring dpcpp,$(CC)))
   CC = dpcpp
   CFLAGS += -fsycl-unnamed-lambda
-  #By default we build the CPU version - other flags will generate differently named exe fils
-	program = XSBench.cpu
+  #By default we build the CPU version - other flags will generate differently named exe files
+  program = XSBench.cpu
 
 ifneq (,$(filter $(DPCPP_MODE),fpga_emu fpga_report fpga_hw fpga_profile))
   CFLAGS += -fintelfpga
