@@ -58,9 +58,9 @@ unsigned long long run_event_based_simulation(Inputs in, SimulationData SD, int 
 		} else if (devname == "HOST") {
        			sycl_q = host_selector{};
    		} else if (devname == "FPGA_EMU") {
-		       sycl_q = INTEL::fpga_emulator_selector{};
+		       sycl_q = ext::intel::fpga_emulator_selector{};
    		} else if (devname == "FPGA") {
-       			sycl_q = INTEL::fpga_selector{};
+       			sycl_q = ext::intel::fpga_selector{};
    		} else {
        			std::cout << "XS_DEVICE must be CPU, GPU, FPGA_EMU, FPGA or HOST" << std::endl;
        			std::abort();
