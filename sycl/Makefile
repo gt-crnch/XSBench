@@ -49,11 +49,64 @@ ifeq ($(CC),llvm)
 endif
 
 # DPC++ Compiler
+
+# FPGA_EMULATOR
+# dpcpp -fintelfpga -DFPGA_EMULATOR <target>.cpp
+
+# FPGA_EMULATOR
+# dpcpp -fintelfpga -DFPGA_EMULATOR <target>.cpp
+
+# Report 
+#dpcpp -fintelfpga -Xshardware -Xsboard=<FPGA_BOARD> -fsycl-link=early <target>.cpp
+
+#Hardware
+#dpcpp -fintelfpga -Xshardware -Xsboard=<FPGA_BOARD> <target>.cpp
+
+#Profile on the Hardware
+#dpcpp -fintelfpga -Xshardware -Xsboard=<FPGA_BOARD> -Xsprofile <target>.cpp
+
 ifneq (,$(findstring dpcpp,$(CC)))
   CC = dpcpp
-  CFLAGS += -fsycl
-  LDFLAGS += -lOpenCL
+  CFLAGS += -fsycl-unnamed-lambda
+  #By default we build the CPU version - other flags will generate differently named exe files
+  program = XSBench.cpu
+
+ifneq (,$(filter $(DPCPP_MODE),fpga_emu fpga_report fpga_hw fpga_profile))
+  CFLAGS += -fintelfpga
 endif
+# CPU flags
+#ifneq (,$(findstring cpu,$(DPCPP_MODE)))
+#  program = XSBench.cpu
+#endif
+# Emulation only flags
+ifneq (,$(findstring fpga_emu,$(DPCPP_MODE)))
+  program = XSBench.fpga_emu
+endif
+# Report only flags
+ifneq (,$(findstring fpga_report,$(DPCPP_MODE)))
+  CFLAGS += -fsycl-link -fsycl -fsycl-unnamed-lambda -g  -fno-sycl-early-optimizations
+  program = XSBench.fpga_report
+endif
+#Report and HW shared flags
+ifneq (,$(filter $(DPCPP_MODE),fpga_report fpga_hw fpga_profile))
+  CFLAGS += -Xshardware -Xsboard=intel_s10sx_pac:pac_s10
+endif
+# HW only flags
+ifneq (,$(findstring fpga_hw,$(DPCPP_MODE)))
+  CFLAGS += -Xsdont-error-if-large-area-est
+  program = XSBench.fpga
+endif
+# HW profile only flags
+ifneq (,$(findstring fpga_profile,$(DPCPP_MODE)))
+  CFLAGS += -Xsprofile
+  program = XSBench.fpga.profile
+endif
+endif
+
+# Unused flags
+# CFLAGS += -fsycl-targets=spir64_fpga-unknown-unknown-sycldevice
+# CFLAGS += -fsycl -fno-sycl-early-optimizations
+# LDFLAGS += -lOpenCL
 
 # Debug Flags
 ifeq ($(DEBUG),yes)
@@ -85,11 +138,14 @@ endif
 $(program): $(obj) XSbench_header.h Makefile
 	$(CC) $(CFLAGS) $(obj) -o $@ $(LDFLAGS)
 
+report: $(obj) XSbench_header.h Makefile
+	$(CC) $(CFLAGS) -o $@ $(obj) $(LDFLAGS)
+
 %.o: %.cpp XSbench_header.h Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(program) $(obj)
+	rm -rf $(program) $(program).* $(obj)
 
 edit:
 	vim -p $(source) XSbench_header.h

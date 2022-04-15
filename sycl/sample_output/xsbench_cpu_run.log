@@ -1,0 +1,55 @@
+================================================================================
+                   __   __ ___________                 _                        
+                   \ \ / //  ___| ___ \               | |                       
+                    \ V / \ `--.| |_/ / ___ _ __   ___| |__                     
+                    /   \  `--. \ ___ \/ _ \ '_ \ / __| '_ \                    
+                   / /^\ \/\__/ / |_/ /  __/ | | | (__| | | |                   
+                   \/   \/\____/\____/ \___|_| |_|\___|_| |_|                   
+
+================================================================================
+                    Developed at Argonne National Laboratory
+                                   Version: 19
+================================================================================
+                                  INPUT SUMMARY
+================================================================================
+Programming Model:            SYCL
+Simulation Method:            Event Based
+Grid Type:                    Unionized Grid
+Materials:                    12
+H-M Benchmark Size:           large
+Total Nuclides:               355
+Gridpoints (per Nuclide):     11,303
+Unionized Energy Gridpoints:  4,012,565
+Total XS Lookups:             17,000,000
+Est. Memory Usage (MB):       5,649
+Binary File Mode:             Off
+================================================================================
+                         INITIALIZATION - DO NOT PROFILE
+================================================================================
+Intializing nuclide grids...
+Intializing unionized grid...
+Intializing material data...
+Intialization complete. Allocated 5648 MB of data.
+
+================================================================================
+                                   SIMULATION
+================================================================================
+Allocating an additional 64.8 MB of memory for verification arrays...
+Running on: Intel(R) Xeon(R) Gold 6226R CPU @ 2.90GHz
+Initializing device buffers and JIT compiling kernel...
+Kernel initialization, compilation, and launch took 0.97 seconds.
+Beginning event based simulation...
+
+Simulation complete.
+================================================================================
+                                     RESULTS
+================================================================================
+Total Time Statistics (SYCL+OpenCL Init / JIT Compilation + Simulation Kernel)
+Runtime:               4.295 seconds
+Lookups:               17,000,000
+Lookups/s:             3,957,972
+Simulation Kernel Only Statistics
+Runtime:               4.295 seconds
+Lookups/s:             3,957,972
+Verification checksum: 952131 (Valid)
+================================================================================

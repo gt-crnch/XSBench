@@ -24,6 +24,7 @@
 #include <chrono> 
 #include <CL/sycl.hpp>
 #include <CL/sycl/INTEL/fpga_extensions.hpp>
+<<<<<<< HEAD
 
 // Papi Header
 #ifdef PAPI
@@ -167,6 +168,8 @@ long grid_search_nuclide( long n, double quarry, T A, long low, long high)
 #endif
 
 
+=======
+>>>>>>> 714dc2139d35d987f47f17b26ee9d9a218b93deb
 // Papi Header
 #ifdef PAPI
 #include "papi.h"
