@@ -48,7 +48,24 @@ unsigned long long run_event_based_simulation(Inputs in, SimulationData SD, int 
 	{
 		// create a queue using the default device for the platform (cpu, gpu)
 
-		queue sycl_q{default_selector()};
+		queue sycl_q;
+		char * devchar = std::getenv("XS_DEVICE");
+		std::string devname = (devchar == NULL) ? "None" : devchar;
+		if (devname == "CPU") {
+			sycl_q = cpu_selector();
+		} else if (devname == "GPU") {
+			sycl_q = gpu_selector();
+		} else if (devname == "HOST") {
+       			sycl_q = host_selector{};
+   		} else if (devname == "FPGA_EMU") {
+		       sycl_q = ext::intel::fpga_emulator_selector{};
+   		} else if (devname == "FPGA") {
+       			sycl_q = ext::intel::fpga_selector{};
+   		} else {
+       			std::cout << "XS_DEVICE must be CPU, GPU, FPGA_EMU, FPGA or HOST" << std::endl;
+       			std::abort();
+   		}
+		// {default_selector()};
 		//queue sycl_q{gpu_selector()};
 		//queue sycl_q{cpu_selector()};
 		if(mype == 0 ) printf("Running on: %s\n", sycl_q.get_device().get_info<cl::sycl::info::device::name>().c_str());
@@ -153,6 +170,7 @@ unsigned long long run_event_based_simulation(Inputs in, SimulationData SD, int 
 					// array that will get tranferred back and reduced on the host.
 					double max = -1.0;
 					int max_idx = 0;
+					#pragma unroll
 					for(int j = 0; j < 5; j++ )
 					{
 						if( macro_xs_vector[j] > max )
@@ -172,6 +190,7 @@ unsigned long long run_event_based_simulation(Inputs in, SimulationData SD, int 
 
 	// Host reduces the verification array
 	unsigned long long verification_scalar = 0;
+	#pragma unroll
 	for( int i = 0; i < in.lookups; i++ )
 		verification_scalar += verification_host[i];
 
@@ -307,12 +326,14 @@ void calculate_macro_xs( double p_energy, int mat, long n_isotopes,
 		E_GRID_TYPE  egrid, INDEX_TYPE  index_data,
 		NGP_Type  nuclide_grids,
 		Int_Type  mats,
-		double * macro_xs_vector, int grid_type, int hash_bins, int max_num_nucs ){
+		double * macro_xs_vector, int grid_type, int hash_bins, int max_num_nucs )
+		{
 	int p_nuc; // the nuclide we are looking up
 	long idx = -1;	
 	double conc; // the concentration of the nuclide in the material
 
 	// cleans out macro_xs_vector
+	#pragma unroll
 	for( int k = 0; k < 5; k++ )
 		macro_xs_vector[k] = 0;
 
@@ -347,8 +368,11 @@ void calculate_macro_xs( double p_energy, int mat, long n_isotopes,
 		calculate_micro_xs( p_energy, p_nuc, n_isotopes,
 				n_gridpoints, egrid, index_data,
 				nuclide_grids, idx, xs_vector, grid_type, hash_bins );
+		#pragma unroll						
 		for( int k = 0; k < 5; k++ )
+		{
 			macro_xs_vector[k] += xs_vector[k] * conc;
+		}
 	}
 }
 
@@ -380,9 +404,11 @@ int pick_mat( unsigned long * seed )
 	double roll = LCG_random_double(seed);
 
 	// makes a pick based on the distro
+	#pragma unroll
 	for( int i = 0; i < 12; i++ )
 	{
 		double running = 0;
+		#pragma unroll
 		for( int j = i; j > 0; j-- )
 			running += dist[j];
 		if( roll < running )
