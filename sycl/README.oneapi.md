@@ -12,6 +12,8 @@ make CC=dpcpp DPCPP_MODE=fpga_emu
 make CC=dpcpp DPCPP_MODE=fpga_report
 # HW bitstream
 make CC=dpcpp DPCPP_MODE=fpga_hw
+#HW and Profile
+make CC=dpcpp DPCPP_MODE=fpga_profile
 ```
 
 ### Running the code
