@@ -1,4 +1,7 @@
 
+## Overview
+This branch of the code is focused on running XSBench on FPGA, targeting the Bittware 520N-MX board.
+
 ### Compiling
 This Makefile likely looks somewhat strange but this is because there is some overlap in flags between FPGA emulation, report generation, and HW bitstream generation.
 
