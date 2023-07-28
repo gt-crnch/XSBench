@@ -144,6 +144,8 @@ void print_inputs(Inputs in, int nprocs, int version )
 
 	printf("Materials:                    %d\n", 12);
 	printf("H-M Benchmark Size:           %s\n", in.HM);
+	printf("Starting Seed:                %d\n", in.starting_seed);
+	printf("Total Nuclides:               %ld\n", in.n_isotopes);
 	printf("Total Nuclides:               %ld\n", in.n_isotopes);
 	printf("Gridpoints (per Nuclide):     ");
 	fancy_int(in.n_gridpoints);
@@ -223,6 +225,7 @@ void print_CLI_error(void)
 	printf("  -h <hash bins>           Number of hash bins (only relevant when used with \"-G hash\")\n");
 	printf("  -b <binary mode>         Read or write all data structures to file. If reading, this will skip initialization phase. (read, write)\n");
 	printf("  -k <kernel ID>           Specifies which kernel to run. 0 is baseline, 1, 2, etc are optimized variants. (0 is default.)\n");
+	printf("  -seed <starting seed>    Default is 1070.\n");
 	printf("Default is equivalent to: -m history -s large -l 34 -p 500000 -G unionized\n");
 	printf("See readme for full description of default run values\n");
 	exit(4);
@@ -261,6 +264,9 @@ Inputs read_CLI( int argc, char * argv[] )
 	
 	// defaults to baseline kernel
 	input.kernel_id = 0;
+	
+	// defaults to 1,070
+	input.starting_seed = 1070;
 	
 	// defaults to H-M Large benchmark
 	input.HM = (char *) malloc( 6 * sizeof(char) );
@@ -395,6 +401,16 @@ Inputs read_CLI( int argc, char * argv[] )
 			if( ++i < argc )
 			{
 				input.kernel_id = atoi(argv[i]);
+			}
+			else
+				print_CLI_error();
+		}
+		// STARTING_SEED (-seed)
+		else if( strcmp(arg, "-seed") == 0 )
+		{
+			if( ++i < argc )
+			{
+				input.starting_seed = atoi(argv[i]);
 			}
 			else
 				print_CLI_error();
